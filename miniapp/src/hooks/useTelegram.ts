@@ -4,49 +4,39 @@ import {
   bindThemeParamsCssVars,
   bindViewportCssVars,
   expandViewport,
+  initData,
   isMiniAppDark,
   setMiniAppHeaderColor,
-  useLaunchParams,
-  useRawInitData,
   useSignal,
 } from '@telegram-apps/sdk-react'
 import type { TelegramUser } from '../types'
 
-function useSafeLaunchParams() {
+/**
+ * Safely restores the Telegram init data state.
+ * Outside Telegram the launch params are missing/invalid, so restore() throws.
+ * We catch it and leave the signals empty – the app can still render a
+ * graceful placeholder or run in dev mode.
+ */
+function restoreInitData(): void {
   try {
-    const params = useLaunchParams(false)
-    console.log('LaunchParams:', params)
-    return params
+    initData.restore()
   } catch (error) {
-    console.warn('Error getting launch params:', error)
-    return undefined
-  }
-}
-
-function useSafeRawInitData() {
-  try {
-    const data = useRawInitData()
-    console.log('RawInitData from hook:', data)
-    return data
-  } catch (error) {
-    console.warn('Error getting raw init data:', error)
-    return undefined
+    console.warn('Failed to restore Telegram init data:', error)
   }
 }
 
 export function useTelegram() {
-  const lp = useSafeLaunchParams()
-  const rawInitData = useSafeRawInitData()
+  // Init data must be restored once before its signals become usable.
+  useEffect(() => {
+    restoreInitData()
+  }, [])
+
+  const rawInitData = useSignal(initData.raw)
+  const tgUser = useSignal(initData.user) as TelegramUser | undefined
+  const startParam = useSignal(initData.startParam)
   const isDark = useSignal(isMiniAppDark)
 
-  const user = lp?.tgWebAppData?.user as TelegramUser | undefined
-
   useEffect(() => {
-    console.log('Telegram hook mounted')
-    console.log('LP data:', lp)
-    console.log('Raw init data:', rawInitData)
-    console.log('User:', user)
-    
     try {
       expandViewport()
       bindMiniAppCssVars()
@@ -54,17 +44,17 @@ export function useTelegram() {
       bindViewportCssVars()
       setMiniAppHeaderColor('bg_color')
     } catch (error) {
-      console.warn('Error in Telegram init:', error)
+      console.warn('Error in Telegram CSS/theme init:', error)
     }
-  }, [lp, rawInitData, user])
+  }, [])
 
   return useMemo(
     () => ({
       rawInitData: rawInitData || '',
-      user,
-      startParam: lp?.tgWebAppStartParam || '',
-      appearance: isDark ? 'dark' : 'light' as 'dark' | 'light',
+      user: tgUser,
+      startParam: startParam || '',
+      appearance: (isDark ? 'dark' : 'light') as 'dark' | 'light',
     }),
-    [rawInitData, user, lp?.tgWebAppStartParam, isDark],
+    [rawInitData, tgUser, startParam, isDark],
   )
 }
