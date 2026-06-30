@@ -59,8 +59,18 @@ func (h *Stars) SelectSelf(ctx context.Context, cb *telego.CallbackQuery) {
 func (h *Stars) SelectProduct(ctx context.Context, cb *telego.CallbackQuery) {
 	chatID := cb.Message.GetChat().ID
 	id := strings.TrimPrefix(cb.Data, "buy_stars:")
+
+	items, _ := h.catalog.Stars(ctx, "RUB")
+	label := id
+	for _, it := range items {
+		if it.ID == id {
+			label = strconv.Itoa(it.Value)
+			break
+		}
+	}
+
 	h.fsm.SetData(chatID, "stars_product_id", id)
-	h.fsm.SetData(chatID, "stars_product_name", id) // или маппинг на имя
+	h.fsm.SetData(chatID, "stars_product_name", label)
 	h.fsm.SetData(chatID, "custom_stars", 0)
 	h.ShowFlow(ctx, chatID)
 	h.render.Answer(ctx, cb.ID, "", false)
@@ -73,6 +83,7 @@ func (h *Stars) ShowCustomAmount(ctx context.Context, chatID int64) {
 
 func (h *Stars) HandleCustomAmount(ctx context.Context, msg *telego.Message) {
 	chatID := msg.Chat.ID
+	defer h.render.DeleteMsg(ctx, chatID, msg.MessageID)
 	lang := h.lang(chatID)
 
 	amount, err := strconv.Atoi(strings.TrimSpace(msg.Text))
@@ -133,14 +144,19 @@ func (h *Stars) Checkout(ctx context.Context, cb *telego.CallbackQuery) {
 	h.fsm.SetData(chatID, "pending_amount", order.Amount)
 	h.fsm.Replace(chatID, domain.StateStarsPayment)
 
-	text := i18n.PaymentScreen(lang, false, "@"+rec, h.productName(lang, order), formatAmount(order.Amount, order.Currency))
+	text := i18n.PaymentScreen(lang, false, "@"+rec, h.productName(order), formatAmount(order.Amount, order.Currency))
 	h.render.EditMenu(ctx, chatID, text, keyboards.PaymentMethods(lang))
 	h.render.Answer(ctx, cb.ID, "", false)
 }
 
-func (h *Stars) productName(lang i18n.Lang, o *domain.Order) string {
+func (h *Stars) productName(o *domain.Order) string {
 	if o.StarsAmount != nil {
-		return i18n.StarsLabel(lang, *o.StarsAmount)
+		return strconv.Itoa(*o.StarsAmount)
+	}
+	if strings.HasPrefix(o.ProductID, "stars_") {
+		if v, err := strconv.Atoi(strings.TrimPrefix(o.ProductID, "stars_")); err == nil {
+			return strconv.Itoa(v)
+		}
 	}
 	return o.ProductID
 }

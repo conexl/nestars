@@ -10,6 +10,7 @@ const (
 	StateStarsPayment   FlowState = "stars_payment"
 	StatePremiumFlow    FlowState = "premium_flow"
 	StatePremiumWho     FlowState = "premium_who"
+	StatePremiumCustom  FlowState = "premium_custom_amount"
 	StatePremiumPayment FlowState = "premium_payment"
 	StateProfile        FlowState = "profile"
 	StateReferral       FlowState = "referral_program"

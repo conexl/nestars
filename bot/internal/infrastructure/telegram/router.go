@@ -77,6 +77,8 @@ func (r *Router) Dispatch(ctx context.Context, up telego.Update) {
 		// TODO: ввод username для Stars
 	case domain.StatePremiumWho:
 		r.premium.HandleRecipient(ctx, msg)
+	case domain.StatePremiumCustom:
+		r.premium.HandleCustomAmount(ctx, msg)
 	case domain.StateWithdrawWho, domain.StateWithdrawAmount:
 		// TODO: withdraw
 	}
@@ -121,6 +123,9 @@ func (r *Router) handleCallback(ctx context.Context, cb *telego.CallbackQuery) {
 	case data == "premium_select_user":
 		r.fsm.Push(chatID, domain.StatePremiumWho)
 		r.premium.ShowRecipient(ctx, chatID)
+	case data == "premium_custom":
+		r.fsm.Push(chatID, domain.StatePremiumCustom)
+		r.premium.ShowCustomAmount(ctx, chatID)
 	case strings.HasPrefix(data, "buy_premium:"):
 		r.premium.SelectProduct(ctx, cb)
 	case data == "premium_checkout":
@@ -147,7 +152,7 @@ func (r *Router) handleBack(ctx context.Context, chatID int64, cb *telego.Callba
 	case domain.StatePremiumFlow:
 		r.fsm.Reset(chatID)
 		r.menu.ShowMain(ctx, chatID)
-	case domain.StatePremiumWho:
+	case domain.StatePremiumWho, domain.StatePremiumCustom:
 		r.fsm.Pop(chatID)
 		r.premium.ShowFlow(ctx, chatID)
 	case domain.StatePremiumPayment:

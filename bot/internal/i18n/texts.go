@@ -313,6 +313,20 @@ func InvalidStarsAmount(lang Lang) string {
 	return "⚠️ Enter an amount between 50 and 1,000,000 ⭐"
 }
 
+func PremiumCustomAmount(lang Lang) string {
+	if lang == RU {
+		return "ℹ️ Введите количество месяцев Premium вручную:"
+	}
+	return "ℹ️ Enter Premium subscription months manually:"
+}
+
+func InvalidPremiumMonths(lang Lang) string {
+	if lang == RU {
+		return "⚠️ Введите количество от 1 до 60 месяцев"
+	}
+	return "⚠️ Enter a value between 1 and 60 months"
+}
+
 func UsernameRequired(lang Lang) string {
 	if lang == RU {
 		return "❗ Для покупки звёзд или Premium необходимо иметь @username"

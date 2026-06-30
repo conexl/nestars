@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/mymmrac/telego"
@@ -57,6 +59,29 @@ func (h *Premium) SelectSelf(ctx context.Context, cb *telego.CallbackQuery) {
 func (h *Premium) ShowRecipient(ctx context.Context, chatID int64) {
 	lang := h.lang(chatID)
 	h.render.EditMenu(ctx, chatID, i18n.PremiumWho(lang), keyboards.BackOnly(lang))
+}
+
+func (h *Premium) ShowCustomAmount(ctx context.Context, chatID int64) {
+	lang := h.lang(chatID)
+	h.render.EditMenu(ctx, chatID, i18n.PremiumCustomAmount(lang), keyboards.BackOnly(lang))
+}
+
+func (h *Premium) HandleCustomAmount(ctx context.Context, msg *telego.Message) {
+	chatID := msg.Chat.ID
+	defer h.render.DeleteMsg(ctx, chatID, msg.MessageID)
+	lang := h.lang(chatID)
+
+	months, err := strconv.Atoi(strings.TrimSpace(msg.Text))
+	if err != nil || months < 1 || months > 60 {
+		h.render.EditMenu(ctx, chatID, i18n.InvalidPremiumMonths(lang), keyboards.BackOnly(lang))
+		return
+	}
+
+	h.fsm.SetData(chatID, "premium_product_id", fmt.Sprintf("premium_%d", months))
+	h.fsm.SetData(chatID, "premium_product_name", i18n.PremiumLabel(lang, months)+" "+i18n.MonthWord(lang, months))
+	h.fsm.SetData(chatID, "premium_months", months)
+	h.fsm.Pop(chatID)
+	h.ShowFlow(ctx, chatID)
 }
 
 func (h *Premium) HandleRecipient(ctx context.Context, msg *telego.Message) {

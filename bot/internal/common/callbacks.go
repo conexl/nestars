@@ -8,7 +8,8 @@ const (
 	CbStarsSelf   = "stars_self"
 	CbStarsCustom = "stars_custom"
 
-	CbPremiumSelf = "premium_self"
+	CbPremiumSelf   = "premium_self"
+	CbPremiumCustom = "premium_custom"
 
 	CbReferralProgram = "referral_program"
 	CbWithdrawStars   = "withdraw_stars"

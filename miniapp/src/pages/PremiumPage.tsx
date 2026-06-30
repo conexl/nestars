@@ -4,6 +4,7 @@ import { Gem } from 'lucide-react'
 import { Card } from '../components/Card'
 import { Page } from '../components/Page'
 import { Button } from '../components/Button'
+import { Input } from '../components/Input'
 import { BackButton } from '../components/BackButton'
 import { Loader } from '../components/Loader'
 import { getCatalogPremium } from '../api/client'
@@ -20,6 +21,7 @@ export function PremiumPage({ t }: PremiumPageProps) {
   const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<string | null>(null)
+  const [custom, setCustom] = useState('')
 
   useEffect(() => {
     getCatalogPremium()
@@ -28,16 +30,26 @@ export function PremiumPage({ t }: PremiumPageProps) {
       .finally(() => setLoading(false))
   }, [])
 
-  const selectedItem = useMemo(() => items.find((i) => i.id === selected), [items, selected])
+  const selectedValue = useMemo(() => {
+    if (selected) {
+      const item = items.find((i) => i.id === selected)
+      return item ? { productId: item.id, name: item.name } : null
+    }
+    const value = parseInt(custom, 10)
+    if (!Number.isNaN(value) && value >= 1 && value <= 60) {
+      return { productId: `premium_${value}`, name: `${value} ${t.months}` }
+    }
+    return null
+  }, [selected, custom, items, t.months])
 
   const handleContinue = () => {
-    if (!selectedItem) return
+    if (!selectedValue) return
     navigate('/recipient', {
       state: {
         productType: 'Premium',
-        productId: selectedItem.id,
+        productId: selectedValue.productId,
         stars: 0,
-        name: selectedItem.name,
+        name: selectedValue.name,
       },
     })
   }
@@ -66,7 +78,10 @@ export function PremiumPage({ t }: PremiumPageProps) {
           <Card
             key={item.id}
             active={selected === item.id}
-            onClick={() => setSelected(item.id)}
+            onClick={() => {
+              setSelected(item.id)
+              setCustom('')
+            }}
             className={styles.plan}
           >
             <div className={styles.planInfo}>
@@ -84,7 +99,23 @@ export function PremiumPage({ t }: PremiumPageProps) {
         ))}
       </div>
 
-      <Button fullWidth disabled={!selectedItem} onClick={handleContinue}>
+      <Card className={styles.customCard}>
+        <Input
+          label={t.customAmount}
+          type="number"
+          placeholder="6"
+          value={custom}
+          onChange={(e) => {
+            setCustom(e.target.value)
+            setSelected(null)
+          }}
+        />
+        <p className={styles.hint}>
+          {t.minMonths} — {t.maxMonths}
+        </p>
+      </Card>
+
+      <Button fullWidth disabled={!selectedValue} onClick={handleContinue}>
         {t.continue}
       </Button>
     </Page>

@@ -88,7 +88,18 @@ func StarsFlowMenu(lang i18n.Lang, storage FlowStorage, chatID int64, items []St
 	}
 
 	buttons = append(buttons, []telego.InlineKeyboardButton{
-		{Text: starsRecipientLabel(lang, recipient), CallbackData: "stars_select_user", Style: telego.ButtonStylePrimary, IconCustomEmojiID: "6145278957039131275"},
+		{
+			Text:              i18n.Self(lang),
+			CallbackData:      common.CbStarsSelf,
+			Style:             telego.ButtonStylePrimary,
+			IconCustomEmojiID: "6145278957039131275",
+		},
+		{
+			Text:              starsRecipientLabel(lang, recipient),
+			CallbackData:      "stars_select_user",
+			Style:             telego.ButtonStylePrimary,
+			IconCustomEmojiID: "6145278957039131275",
+		},
 	})
 
 	buttons = append(buttons, []telego.InlineKeyboardButton{

@@ -12,9 +12,8 @@ COPY miniapp/ .
 RUN VITE_DISABLE_AUTH=${VITE_DISABLE_AUTH} npm run build
 
 # Stage 2: build Go bot
-FROM golang:1.24-alpine AS go-builder
+FROM golang:1.26-alpine AS go-builder
 
-ENV GOTOOLCHAIN=auto
 WORKDIR /app
 
 COPY bot/go.mod bot/go.sum ./

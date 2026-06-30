@@ -94,6 +94,10 @@ func PremiumFlowMenu(lang i18n.Lang, storage FlowStorage, chatID int64, items []
 		},
 	})
 
+	buttons = append(buttons, []telego.InlineKeyboardButton{
+		{Text: i18n.EnterAmount(lang), CallbackData: common.CbPremiumCustom, Style: telego.ButtonStylePrimary, IconCustomEmojiID: "5879841310902324730"},
+	})
+
 	if recipient != i18n.NotSelected(lang) && product != i18n.NotSelectedValue(lang) {
 		buttons = append(buttons, []telego.InlineKeyboardButton{
 			BackButton(lang),

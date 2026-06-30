@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.uber.org/fx"
 
@@ -51,6 +52,7 @@ func (s *Server) router() http.Handler {
 
 	// API routes.
 	mux.HandleFunc("POST /api/miniapp/auth", s.handleAuth)
+	mux.HandleFunc("POST /api/miniapp/auth/", s.handleAuth)
 	mux.HandleFunc("GET /api/miniapp/catalog/stars", s.authMiddleware(s.handleCatalogStars))
 	mux.HandleFunc("GET /api/miniapp/catalog/premium", s.authMiddleware(s.handleCatalogPremium))
 	mux.HandleFunc("POST /api/miniapp/orders", s.authMiddleware(s.handleCreateOrder))
@@ -94,6 +96,12 @@ func Run(lc fx.Lifecycle, s *Server) {
 
 func (s *Server) spaHandler(staticPath string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// API paths should never fall back to the SPA; return JSON 404.
+		if strings.HasPrefix(r.URL.Path, "/api/") {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
+			return
+		}
+
 		if r.URL.Path == "/" || filepath.Ext(r.URL.Path) == "" {
 			http.ServeFile(w, r, filepath.Join(staticPath, "index.html"))
 			return

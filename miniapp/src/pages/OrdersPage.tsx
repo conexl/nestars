@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Card } from '../components/Card'
 import { Page } from '../components/Page'
-import { BackButton } from '../components/BackButton'
 import { Loader } from '../components/Loader'
 import { getOrders } from '../api/client'
 import type { Order } from '../types'
@@ -12,14 +11,9 @@ interface OrdersPageProps {
   t: Translations
 }
 
-type Filter = 'all' | 'paid' | 'pending' | 'cancelled'
-
-const filters: Filter[] = ['all', 'paid', 'pending', 'cancelled']
-
 export function OrdersPage({ t }: OrdersPageProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<Filter>('all')
 
   useEffect(() => {
     getOrders()
@@ -27,8 +21,6 @@ export function OrdersPage({ t }: OrdersPageProps) {
       .catch(() => setOrders([]))
       .finally(() => setLoading(false))
   }, [])
-
-  const filtered = orders.filter((o) => (filter === 'all' ? true : o.status === filter))
 
   const statusLabel = (status: string) => {
     switch (status) {
@@ -61,30 +53,15 @@ export function OrdersPage({ t }: OrdersPageProps) {
 
   return (
     <Page>
-      <BackButton text={t.back} />
-
       <h2 className={styles.title}>{t.history}</h2>
-
-      <div className={styles.filters}>
-        {filters.map((f) => (
-          <button
-            key={f}
-            type="button"
-            className={filter === f ? styles.activeFilter : styles.filter}
-            onClick={() => setFilter(f)}
-          >
-            {statusLabel(f)}
-          </button>
-        ))}
-      </div>
 
       {loading ? (
         <Loader />
-      ) : filtered.length === 0 ? (
+      ) : orders.length === 0 ? (
         <Card className={styles.empty}>{t.history}</Card>
       ) : (
         <div className={styles.list}>
-          {filtered.map((order) => (
+          {orders.map((order) => (
             <Card key={order.id} className={styles.order}>
               <div className={styles.orderHeader}>
                 <span className={styles.orderNumber}>#{order.order_number}</span>
