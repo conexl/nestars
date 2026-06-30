@@ -20,8 +20,6 @@ services:
     build: ./fragment
     container_name: nestars-fragment
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     healthcheck:
       test:
         ["CMD", "python", "-c",
@@ -33,25 +31,14 @@ services:
     networks:
       - nestars
 
-  miniapp:
-    build: ./miniapp
-    container_name: nestars-miniapp
-    restart: unless-stopped
-    ports:
-      - "8081:80"
-    depends_on:
-      bot:
-        condition: service_started
-    networks:
-      - nestars
-
-  bot:
+  api:
     build:
       context: .
       dockerfile: ./bot/Dockerfile
+      target: api
       args:
         VITE_DISABLE_AUTH: "true"
-    container_name: nestars-bot
+    container_name: nestars-api
     restart: unless-stopped
     env_file:
       - bot.env
@@ -62,12 +49,24 @@ services:
       - MINIAPP_STATIC_PATH=/app/miniapp/dist
       - MINIAPP_DISABLE_AUTH=true
     ports:
-      - "8080:8080"
+      - "8090:8080"
     depends_on:
       mongo:
         condition: service_healthy
       fragment:
         condition: service_healthy
+    networks:
+      - nestars
+
+  miniapp:
+    build: ./miniapp
+    container_name: nestars-miniapp
+    restart: unless-stopped
+    ports:
+      - "8091:80"
+    depends_on:
+      api:
+        condition: service_started
     networks:
       - nestars
 

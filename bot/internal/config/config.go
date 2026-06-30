@@ -9,7 +9,8 @@ type Links struct {
 
 type Config struct {
 	Telegram struct {
-		Token string
+		Token    string
+		ProxyURL string
 	}
 	BackendURL      string
 	MockBackend     bool
@@ -29,6 +30,7 @@ var Cfg *Config
 func NewConfig() *Config {
 	c := &Config{}
 	c.Telegram.Token = os.Getenv("BOT_TOKEN")
+	c.Telegram.ProxyURL = os.Getenv("TELEGRAM_PROXY_URL")
 	c.BackendURL = os.Getenv("BACKEND_URL")
 	c.MockBackend = os.Getenv("MOCK_BACKEND") == "true"
 	c.MongoURI = getEnv("MONGO_URI", "mongodb://localhost:27017")

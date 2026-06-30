@@ -1,0 +1,32 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: nestars-bot-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - bot
+
+  bot:
+    build:
+      context: .
+      dockerfile: ./bot/Dockerfile
+      target: bot
+      args:
+        VITE_DISABLE_AUTH: "true"
+    container_name: nestars-bot
+    restart: unless-stopped
+    env_file:
+      - bot.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB=nestars_bot
+    networks:
+      - bot
+
+volumes:
+  mongo_data:
+
+networks:
+  bot:
