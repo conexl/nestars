@@ -9,7 +9,6 @@ export function setInitData(raw: string) {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const url = `${API_URL}/api/miniapp${path}`
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(initDataRaw ? { Authorization: `tma ${initDataRaw}` } : {}),
@@ -19,18 +18,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     Object.assign(headers, options.headers)
   }
 
-  console.log('[api/client] request:', { url, method: options.method || 'GET', headers })
-
-  const response = await fetch(url, {
+  const response = await fetch(`${API_URL}/api/miniapp${path}`, {
     ...options,
     headers,
   })
 
-  console.log('[api/client] response:', { url, status: response.status, statusText: response.statusText, contentType: response.headers.get('content-type') })
-
   if (!response.ok) {
     const text = await response.text()
-    console.error('[api/client] non-ok response body:', text.slice(0, 1000))
     throw new Error(text || `HTTP ${response.status}`)
   }
 
@@ -39,19 +33,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   const responseText = await response.text()
-  console.log('[api/client] response body:', responseText.slice(0, 1000))
-
   try {
     return JSON.parse(responseText) as T
-  } catch (parseError) {
-    console.error('[api/client] JSON.parse failed:', parseError)
-    console.error('[api/client] raw response was:', responseText.slice(0, 1000))
-    throw new Error(`Invalid JSON response from ${url}: ${responseText.slice(0, 200)}`)
+  } catch {
+    throw new Error(`Invalid JSON response from ${path}: ${responseText.slice(0, 200)}`)
   }
 }
 
 export async function auth(rawInitData: string): Promise<AuthResponse> {
-  console.log('[api/client] auth called with rawInitData length:', rawInitData.length)
   setInitData(rawInitData)
   return request('/auth', {
     method: 'POST',
