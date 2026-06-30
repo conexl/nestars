@@ -1,0 +1,54 @@
+.page {
+  align-items: center;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.successIcon {
+  color: var(--accent);
+}
+
+.pendingIcon {
+  color: var(--gold);
+}
+
+.title {
+  margin: 20px 0 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.timer {
+  margin: 10px 0 0;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.summary {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.value {
+  font-weight: 700;
+}
+
+.payLink {
+  width: 100%;
+  text-decoration: none;
+}

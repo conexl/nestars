@@ -1,0 +1,108 @@
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.filter,
+.activeFilter {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.activeFilter {
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orderNumber {
+  font-weight: 700;
+}
+
+.statusPaid,
+.statusPending,
+.statusBad {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.statusPaid {
+  background: var(--accent-secondary);
+  color: var(--accent);
+}
+
+.statusPending {
+  background: rgba(241, 170, 5, 0.12);
+  color: var(--gold);
+}
+
+.statusBad {
+  background: rgba(223, 73, 77, 0.12);
+  color: var(--destructive);
+}
+
+.orderBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.orderType {
+  font-weight: 700;
+}
+
+.orderRecipient {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.orderFooter {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+.empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+}

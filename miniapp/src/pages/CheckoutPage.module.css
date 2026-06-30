@@ -1,0 +1,60 @@
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.subtitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.value {
+  font-weight: 700;
+}
+
+.methods {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.method {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.methodName {
+  font-weight: 700;
+}
+
+.methodHint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--destructive);
+  font-size: 14px;
+  text-align: center;
+}

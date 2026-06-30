@@ -1,0 +1,76 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: nestars-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: nestars_bot
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - nestars
+
+  fragment:
+    build: ./fragment
+    container_name: nestars-fragment
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        ["CMD", "python", "-c",
+         "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - nestars
+
+  miniapp:
+    build: ./miniapp
+    container_name: nestars-miniapp
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    networks:
+      - nestars
+
+  bot:
+    build:
+      context: .
+      dockerfile: ./bot/Dockerfile
+      args:
+        VITE_DISABLE_AUTH: "true"
+    container_name: nestars-bot
+    restart: unless-stopped
+    env_file:
+      - bot.env
+    environment:
+      - BACKEND_URL=http://fragment:8000
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB=nestars_bot
+      - MINIAPP_STATIC_PATH=/app/miniapp/dist
+      - MINIAPP_DISABLE_AUTH=true
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      fragment:
+        condition: service_healthy
+    networks:
+      - nestars
+
+volumes:
+  mongo_data:
+
+networks:
+  nestars:
+    driver: bridge

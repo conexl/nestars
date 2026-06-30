@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+.ruff_cache
+.env
+.env.example
+*.md
+Dockerfile
+.dockerignore
+openapi.json
+swagger.yaml
+generate_openapi.py

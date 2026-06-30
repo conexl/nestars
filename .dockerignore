@@ -1,0 +1,11 @@
+.git
+.gitignore
+*.md
+bot/Dockerfile
+bot/.dockerignore
+fragment/Dockerfile
+fragment/.dockerignore
+miniapp/node_modules
+miniapp/.venv
+miniapp/.ruff_cache
+miniapp/__pycache__
