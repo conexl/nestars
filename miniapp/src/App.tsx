@@ -19,18 +19,23 @@ import { WithdrawPage } from './pages/WithdrawPage'
 import styles from './App.module.css'
 
 function AppContent() {
+  console.log('[AppContent] render start')
   const { rawInitData, user: tgUser } = useTelegram()
+  console.log('[AppContent] useTelegram result:', { rawInitData, tgUser })
   const { user, profile, loading, error, refresh } = useAuth(rawInitData)
+  console.log('[AppContent] useAuth result:', { user, profile, loading, error })
   const { setUserData, setRefreshFn } = useUser()
   const { t } = useI18n(tgUser?.language_code)
 
   useEffect(() => {
+    console.log('[AppContent] user/profile effect:', { user, profile })
     if (user && profile) {
       setUserData(user, profile)
     }
   }, [user, profile, setUserData])
 
   useEffect(() => {
+    console.log('[AppContent] refresh fn effect')
     setRefreshFn(refresh)
   }, [refresh, setRefreshFn])
 

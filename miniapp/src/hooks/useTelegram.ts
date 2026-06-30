@@ -18,37 +18,55 @@ import type { TelegramUser } from '../types'
  * graceful placeholder or run in dev mode.
  */
 function restoreInitData(): void {
+  console.log('[useTelegram] before initData.restore()')
   try {
     initData.restore()
+    console.log('[useTelegram] initData.restore() succeeded')
   } catch (error) {
-    console.warn('Failed to restore Telegram init data:', error)
+    console.warn('[useTelegram] initData.restore() failed:', error)
   }
 }
 
 export function useTelegram() {
+  console.log('[useTelegram] hook called')
+
   // Init data must be restored once before its signals become usable.
   useEffect(() => {
+    console.log('[useTelegram] mount effect: calling restoreInitData()')
     restoreInitData()
+    console.log('[useTelegram] mount effect: restoreInitData() returned')
   }, [])
 
+  console.log('[useTelegram] before useSignal calls')
   const rawInitData = useSignal(initData.raw)
+  console.log('[useTelegram] useSignal(initData.raw) =', rawInitData)
   const tgUser = useSignal(initData.user) as TelegramUser | undefined
+  console.log('[useTelegram] useSignal(initData.user) =', tgUser)
   const startParam = useSignal(initData.startParam)
+  console.log('[useTelegram] useSignal(initData.startParam) =', startParam)
   const isDark = useSignal(isMiniAppDark)
+  console.log('[useTelegram] useSignal(isMiniAppDark) =', isDark)
 
   useEffect(() => {
+    console.log('[useTelegram] theme effect: start')
     try {
+      console.log('[useTelegram] calling expandViewport()')
       expandViewport()
+      console.log('[useTelegram] calling bindMiniAppCssVars()')
       bindMiniAppCssVars()
+      console.log('[useTelegram] calling bindThemeParamsCssVars()')
       bindThemeParamsCssVars()
+      console.log('[useTelegram] calling bindViewportCssVars()')
       bindViewportCssVars()
+      console.log('[useTelegram] calling setMiniAppHeaderColor()')
       setMiniAppHeaderColor('bg_color')
+      console.log('[useTelegram] theme effect: done')
     } catch (error) {
-      console.warn('Error in Telegram CSS/theme init:', error)
+      console.warn('[useTelegram] theme effect error:', error)
     }
   }, [])
 
-  return useMemo(
+  const result = useMemo(
     () => ({
       rawInitData: rawInitData || '',
       user: tgUser,
@@ -57,4 +75,7 @@ export function useTelegram() {
     }),
     [rawInitData, tgUser, startParam, isDark],
   )
+
+  console.log('[useTelegram] returning result:', result)
+  return result
 }
